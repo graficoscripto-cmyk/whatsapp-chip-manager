@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#070C14" />
+  <title>WhatsApp Chip Manager — Painel de Conexão & Frota</title>
+  <meta name="description" content="Painel gerenciador de chips e instâncias de WhatsApp com conexão instantânea via QR Code para Evolution API v2." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-base: #070C14;
+      --bg-surface: #0D1522;
+      --bg-elevated: #131E30;
+      --bg-glass: rgba(13, 21, 34, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(16, 185, 129, 0.35);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --accent-emerald: #10B981;
+      --accent-emerald-hover: #059669;
+      --accent-emerald-Soft: rgba(16, 185, 129, 0.14);
+      --accent-amber: #F59E0B;
+      --accent-amber-soft: rgba(245, 158, 11, 0.15);
+      --accent-rose: #F43F5E;
+      --accent-rose-soft: rgba(244, 63, 94, 0.14);
+      --accent-sky: #38BDF8;
+      --accent-sky-soft: rgba(56, 189, 248, 0.14);
+      --accent-violet: #A78BFA;
+      --accent-violet-soft: rgba(167, 139, 250, 0.14);
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-card: 0 14px 34px -10px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-color: var(--bg-base);
+      background-image:
+        radial-gradient(circle at 12% 0%, rgba(16, 185, 129, 0.10), transparent 40%),
+        radial-gradient(circle at 88% 12%, rgba(56, 189, 248, 0.08), transparent 42%);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    /* Barra Superior Fixa & Auto-Hide */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: var(--bg-glass);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .navbar.nav-hidden {
+      transform: translateY(-150%);
+    }
+
+    .navbar-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(56, 189, 248, 0.1));
+      border: 1px solid var(--border-highlight);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.18);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--accent-emerald-Soft);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .brand-sub {
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-link {
+      padding: 8px 12px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.18s ease;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Botões Mobile-First >= 44px */
+    .btn {
+      min-height: 44px;
+      padding: 0 15px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      font-weight: 600;
+      font-size: 0.86rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent-emerald);
+      color: #04130D;
+      font-weight: 700;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #34D399;
+      transform: translateY(-1px);
+    }
+
+    .btn-warning {
+      background: var(--accent-amber);
+      color: #1A1002;
+      font-weight: 700;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.22);
+    }
+
+    .btn-warning:hover:not(:disabled) {
+      background: #FBBF24;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #1C2B42;
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .btn-danger {
+      background: var(--accent-rose-soft);
+      color: #FDA4AF;
+      border-color: rgba(244, 63, 94, 0.28);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: rgba(244, 63, 94, 0.24);
+      color: #FFF;
+    }
+
+    .btn-icon {
+      width: 44px;
+      padding: 0;
+    }
+
+    /* Container Principal */
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 20px 16px 64px;
+    }
+
+    /* Banner de Conexão / Servidor (Env / LocalStorage) */
+    .connection-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-card);
+    }
+
+    .server-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pulse-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
+
+    .pulse-dot.offline {
+      background: var(--accent-rose);
+      box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.2);
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .server-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .server-url-label {
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .server-sub {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Resumo da Frota */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .summary-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .summary-label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .summary-value {
+      font-family: var(--font-display);
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .summary-foot {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Cabeçalho de Seção */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-subtitle {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+    }
+
+    /* Grid de Chips / Instâncias */
+    .chips-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    @media (min-width: 740px) {
+      .chips-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1080px) {
+      .chips-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .chip-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      box-shadow: var(--shadow-card);
+      transition: border-color 0.2s ease, transform 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chip-card.status-open {
+      border-color: rgba(16, 185, 129, 0.32);
+    }
+
+    .chip-card.status-connecting {
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .chip-card.status-close {
+      border-color: rgba(244, 63, 94, 0.28);
+    }
+
+    .chip-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .chip-name-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .chip-name {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      word-break: break-all;
+    }
+
+    .chip-integration {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .status-pill.open {
+      background: var(--accent-emerald-Soft);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .status-pill.connecting {
+      background: var(--accent-amber-soft);
+      color: #FBBF24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .status-pill.close {
+      background: var(--accent-rose-soft);
+      color: #FB7185;
+      border: 1px solid rgba(244, 63, 94, 0.35);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Perfil do Chip */
+    .chip-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .chip-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      font-size: 1rem;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .chip-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .chip-profile-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .chip-profile-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chip-jid {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Token da Instância */
+    .token-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 11px;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .token-value {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .token-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      min-height: 34px;
+    }
+
+    .token-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Alerta de Desconexão / Pareamento */
+    .chip-alert {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(245, 158, 11, 0.09);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chip-alert-text {
+      font-size: 0.8rem;
+      color: #FDE68A;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .chip-alert-reason {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: #FBBF24;
+      opacity: 0.9;
+    }
+
+    /* Contadores (Contatos, Chats, Mensagens) */
+    .chip-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .chip-stat-box {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .chip-stat-num {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.98rem;
+      color: var(--text-primary);
+    }
+
+    .chip-stat-lbl {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Ações do Card */
+    .chip-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .chip-actions-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip-actions-row .btn {
+      flex: 1;
+    }
+
+    /* Seção Reservada: Roadmap / Futuras Funções */
+    .roadmap-section {
+      margin-top: 40px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 768px) {
+      .roadmap-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .roadmap-card {
+      background: linear-gradient(180deg, rgba(19, 30, 48, 0.55), rgba(13, 21, 34, 0.75));
+      border: 1px dashed rgba(148, 163, 184, 0.24);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      position: relative;
+    }
+
+    .roadmap-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .roadmap-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .roadmap-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(167, 139, 250, 0.14);
+      color: #C4B5FD;
+      border: 1px solid rgba(167, 139, 250, 0.3);
+    }
+
+    .roadmap-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .roadmap-desc {
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .roadmap-preview {
+      background: rgba(7, 12, 20, 0.65);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    .roadmap-preview-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.77rem;
+      color: var(--text-secondary);
+    }
+
+    .roadmap-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .roadmap-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-emerald), var(--accent-sky));
+    }
+
+    /* Modais (QR Code, Configuração de Servidor, Nova Instância, Webhook/Settings) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(3, 7, 14, 0.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+      margin: auto;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.18rem;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
+
+    /* Container do QR Code */
+    .qr-stage {
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+
+    .qr-stage img, .qr-stage canvas {
+      width: 248px;
+      height: 248px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .pairing-code-box {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .pairing-code-value {
+      font-family: var(--font-mono);
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      color: var(--accent-emerald);
+    }
+
+    /* Formulários */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 13px;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.18s ease;
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--accent-emerald);
+    }
+
+    .form-hint {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .switch-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--accent-emerald);
+      cursor: pointer;
+    }
+
+    /* Estado Vazio / Sem Conexão */
+    .empty-state {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 36px 20px;
+      text-align: center;
+      max-width: 540px;
+      margin: 24px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-card);
+    }
+
+    /* Toast de Notificação */
+    .toast-wrap {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: calc(100vw - 40px);
+    }
+
+    .toast {
+      background: var(--bg-elevated);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-left: 4px solid var(--accent-emerald);
+      color: var(--text-primary);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast.error {
+      border-left-color: var(--accent-rose);
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(16, 185, 129, 0.2);
+      border-top-color: var(--accent-emerald);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de Topo Enxuta com Auto-Hide -->
+  <header class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="#chips" class="brand">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">
+            <span id="appTitleText">WhatsApp Chip Manager</span>
+            <span class="brand-badge" id="evoVersionBadge">Evolution v2</span>
+          </div>
+          <span class="brand-sub">Conexão QR & Gestão Multi-Chip</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" aria-label="Navegação Principal">
+        <a href="#chips" class="nav-link active">Chips & QR</a>
+        <a href="#roadmap" class="nav-link">Aquecimento & Fila</a>
+        <a href="#api-config" class="nav-link" id="navConfigLink">Servidor API</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button type="button" class="btn btn-secondary" id="btnRefreshAll" title="Atualizar status de todos os chips">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+            <path d="M16 16h5v5"/>
+          </svg>
+          <span>Atualizar</span>
+        </button>
+        <button type="button" class="btn btn-primary" id="btnOpenCreateModal">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>Novo Chip</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Barra de Status do Servidor Evolution API -->
+    <section class="connection-bar" id="api-config" aria-label="Status do Servidor Evolution API">
+      <div class="server-status">
+        <span class="pulse-dot offline" id="serverPulseDot"></span>
+        <div class="server-meta">
+          <span class="server-url-label" id="serverUrlDisplay">Servidor não configurado (Variável de Ambiente / Login)</span>
+          <div class="server-sub">
+            <span id="serverStatusText">Conecte sua URL da Evolution API e Global API Key</span>
+            <span>·</span>
+            <span id="lastSyncText">Aguardando sincronização</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn btn-secondary" id="btnOpenServerModal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>Configurar API</span>
+        </button>
+        <button type="button" class="btn btn-danger" id="btnLogoutServer" style="display:none;">
+          <span>Sair da API</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Cards de Resumo da Frota -->
+    <section class="summary-grid" aria-label="Resumo dos Chips">
+      <div class="summary-card">
+        <div class="summary-label">
+          <span>Total de Chips</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </div>
+        <div class="summary-value" id="statTotal">0</div>
+        <div class="summary-foot">Instâncias cadastradas</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">
+          <span>Conectados (Open)</span>
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--accent-emerald);"></span>
+        </div>
+        <div class="summary-value" id="statOpen" style="color:#34D399;">0</div>
+        <div class="summary-foot">Prontos para operação</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">
+          <span>Aguardando QR</span>
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--accent-amber);"></span>
+        </div>
+        <div class="summary-value" id="statConnecting" style="color:#FBBF24;">0</div>
+        <div class="summary-foot">Em pareamento / reconexão</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">
+          <span>Desconectados</span>
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--accent-rose);"></span>
+        </div>
+        <div class="summary-value" id="statClosed" style="color:#FB7185;">0</div>
+        <div class="summary-foot">Requerem leitura de QR Code</div>
+      </div>
+    </section>
+
+    <!-- Lista de Chips / Instâncias -->
+    <section id="chips" aria-label="Gerenciamento de Chips">
+      <div class="section-head">
+        <div>
+          <h1 class="section-title">Chips & Instâncias de WhatsApp</h1>
+          <p class="section-subtitle">Monitore o status em tempo real e reconecte qualquer aparelho via QR Code ou Pairing Code.</p>
+        </div>
+      </div>
+
+      <div id="chipsContainer"></div>
+    </section>
+
+    <!-- Espaço Reservado para Futuras Funções (Roadmap do Produto SaaS) -->
+    <section class="roadmap-section" id="roadmap" aria-label="Módulos Futuros de Cadência e Aquecimento">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">
+            <span>Módulos de Escala & Proteção Anti-Ban</span>
+            <span class="roadmap-badge">Em Breve · Roadmap SaaS</span>
+          </h2>
+          <p class="section-subtitle">Espaço reservado na arquitetura para controle de cadência, aquecimento automático e distribuição da fila.</p>
+        </div>
+      </div>
+
+      <div class="roadmap-grid">
+        <!-- Card 1: Limite Diário por Chip -->
+        <article class="roadmap-card">
+          <div>
+            <div class="roadmap-head">
+              <div class="roadmap-icon" style="background:var(--accent-emerald-Soft); color:var(--accent-emerald);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+              <span class="roadmap-badge">Módulo Futuro</span>
+            </div>
+            <h3 class="roadmap-title" style="margin-top:14px;">Limite Diário por Chip</h3>
+            <p class="roadmap-desc">Defina o teto máximo de novos contatos diários por instância e trave disparos fora da janela de horário comercial.</p>
+          </div>
+          <div class="roadmap-preview" aria-hidden="true">
+            <div class="roadmap-preview-row">
+              <span>Teto Diário Configurável</span>
+              <strong style="font-family:var(--font-mono);color:var(--text-primary);">15 a 30 envios/dia</strong>
+            </div>
+            <div class="roadmap-bar"><div class="roadmap-bar-fill" style="width:65%;"></div></div>
+            <div class="roadmap-preview-row">
+              <span>Janela Comercial</span>
+              <span style="font-family:var(--font-mono);">08:00 — 18:30</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2: Aquecimento de Chip (Warm-up) -->
+        <article class="roadmap-card">
+          <div>
+            <div class="roadmap-head">
+              <div class="roadmap-icon" style="background:var(--accent-amber-soft); color:var(--accent-amber);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+              </div>
+              <span class="roadmap-badge">Módulo Futuro</span>
+            </div>
+            <h3 class="roadmap-title" style="margin-top:14px;">Aquecimento de Chip (Warm-up)</h3>
+            <p class="roadmap-desc">Rampa progressiva automática para números recém-pareados, aumentando o volume diário conforme a reputação do chip amadurece.</p>
+          </div>
+          <div class="roadmap-preview" aria-hidden="true">
+            <div class="roadmap-preview-row">
+              <span>Fase de Maturação</span>
+              <strong style="font-family:var(--font-mono);color:#FBBF24;">5 → 10 → 25/dia</strong>
+            </div>
+            <div class="roadmap-bar"><div class="roadmap-bar-fill" style="width:40%;background:linear-gradient(90deg,#F59E0B,#10B981);"></div></div>
+            <div class="roadmap-preview-row">
+              <span>Interação entre Instâncias</span>
+              <span style="font-family:var(--font-mono);">Automática</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3: Fila de Pendentes & Cadência -->
+        <article class="roadmap-card">
+          <div>
+            <div class="roadmap-head">
+              <div class="roadmap-icon" style="background:var(--accent-sky-soft); color:var(--accent-sky);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6"/>
+                  <line x1="8" y1="12" x2="21" y2="12"/>
+                  <line x1="8" y1="18" x2="21" y2="18"/>
+                  <line x1="3" y1="6" x2="3.01" y2="6"/>
+                  <line x1="3" y1="12" x2="3.01" y2="12"/>
+                  <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+              </div>
+              <span class="roadmap-badge">Módulo Futuro</span>
+            </div>
+            <h3 class="roadmap-title" style="margin-top:14px;">Fila de Pendentes & Cadência</h3>
+            <p class="roadmap-desc">Distribuição inteligente (round-robin) entre os chips ativos com intervalo aleatório humanizado de 5 a 10 minutos entre envios.</p>
+          </div>
+          <div class="roadmap-preview" aria-hidden="true">
+            <div class="roadmap-preview-row">
+              <span>Intervalo Anti-Spam</span>
+              <strong style="font-family:var(--font-mono);color:var(--accent-sky);">5 a 10 min (Jitter)</strong>
+            </div>
+            <div class="roadmap-bar"><div class="roadmap-bar-fill" style="width:80%;"></div></div>
+            <div class="roadmap-preview-row">
+              <span>Failover Automático</span>
+              <span style="font-family:var(--font-mono);">Redireciona se cair</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL 1: Conectar / Reconectar via QR Code ou Pairing Code -->
+  <div class="modal-backdrop" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 class="modal-title" id="qrModalTitle">Conectar WhatsApp</h2>
+          <p class="section-subtitle" id="qrModalSubtitle">Escaneie o QR Code no aplicativo do celular</p>
+        </div>
+        <button type="button" class="modal-close" id="btnCloseQrModal" aria-label="Fechar modal">✕</button>
+      </div>
+
+      <div class="qr-stage" id="qrStage">
+        <div class="spinner"></div>
+        <p style="color:#334155;font-size:0.84rem;font-weight:600;margin-top:12px;">Solicitando QR Code à Evolution API...</p>
+      </div>
+
+      <div id="pairingCodeSection" style="display:none;">
+        <div class="pairing-code-box">
+          <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:4px;">Código de Pareamento do WhatsApp</p>
+          <div class="pairing-code-value" id="pairingCodeDisplay">----</div>
+        </div>
+      </div>
+
+      <!-- Alternativa: Gerar Código de Pareamento por Número -->
+      <div class="form-group">
+        <label class="form-label" for="pairingPhoneInput">
+          <span>Ou parear por código numérico (opcional)</span>
+        </label>
+        <div style="display:flex;gap:8px;">
+          <input type="tel" id="pairingPhoneInput" class="form-input" placeholder="Ex: 5511999999999 (DDI+DDD+Número)" />
+          <button type="button" class="btn btn-secondary" id="btnGetPairingCode">Gerar Código</button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:0.78rem;color:var(--text-secondary);" id="qrPollingStatus">Verificando conexão a cada 3s...</span>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="btn btn-secondary" id="btnRefreshQr">Novo QR Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Configurar Servidor Evolution API (Variáveis / Login) -->
+  <div class="modal-backdrop" id="serverModal" role="dialog" aria-modal="true" aria-labelledby="serverModalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 class="modal-title" id="serverModalTitle">Conexão com a Evolution API</h2>
+          <p class="section-subtitle">As credenciais ficam salvas apenas no seu navegador (ou via variáveis de ambiente).</p>
+        </div>
+        <button type="button" class="modal-close" id="btnCloseServerModal" aria-label="Fechar modal">✕</button>
+      </div>
+
+      <form id="serverForm" style="display:flex;flex-direction:column;gap:14px;">
+        <div class="form-group">
+          <label class="form-label" for="inputServerUrl">Server URL (Evolution API)</label>
+          <input type="url" id="inputServerUrl" class="form-input" placeholder="https://evo.seudominio.com.br" required />
+          <span class="form-hint">URL base do seu servidor Evolution API v2 (sem /manager no final).</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inputApiKey">Global API Key (apikey)</label>
+          <input type="password" id="inputApiKey" class="form-input" placeholder="Cole sua chave global AUTHENTICATION_API_KEY" required />
+          <span class="form-hint">Validada via POST /verify-creds com cabeçalho apikey.</span>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+          <button type="button" class="btn btn-secondary" id="btnCancelServerModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveServer">Validar & Conectar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Criar Novo Chip / Instância -->
+  <div class="modal-backdrop" id="createModal" role="dialog" aria-modal="true" aria-labelledby="createModalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 class="modal-title" id="createModalTitle">Adicionar Novo Chip</h2>
+          <p class="section-subtitle">Cria uma nova instância via POST /instance/create</p>
+        </div>
+        <button type="button" class="modal-close" id="btnCloseCreateModal" aria-label="Fechar modal">✕</button>
+      </div>
+
+      <form id="createInstanceForm" style="display:flex;flex-direction:column;gap:14px;">
+        <div class="form-group">
+          <label class="form-label" for="inputInstanceName">Nome do Chip / Instância</label>
+          <input type="text" id="inputInstanceName" class="form-input" placeholder="Ex: whats-1, comercial-01" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inputIntegration">Canal de Integração</label>
+          <select id="inputIntegration" class="form-select">
+            <option value="WHATSAPP-BAILEYS">WHATSAPP-BAILEYS (QR Code / Padrão)</option>
+            <option value="WHATSAPP-BUSINESS">WHATSAPP-BUSINESS (Cloud API)</option>
+            <option value="EVOLUTION">EVOLUTION</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inputInstanceToken">Token da Instância</label>
+          <input type="text" id="inputInstanceToken" class="form-input" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inputInstanceNumber">Número do WhatsApp (Opcional)</label>
+          <input type="tel" id="inputInstanceNumber" class="form-input" placeholder="Ex: 5511999999999" />
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+          <button type="button" class="btn btn-secondary" id="btnCancelCreateModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnCreateSubmit">Criar Chip</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Configurações & Webhook do Chip -->
+  <div class="modal-backdrop" id="configModal" role="dialog" aria-modal="true" aria-labelledby="configModalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 class="modal-title" id="configModalTitle">Ajustes & Webhook do Chip</h2>
+          <p class="section-subtitle" id="configModalSubtitle">Configurações nativas da instância</p>
+        </div>
+        <button type="button" class="modal-close" id="btnCloseConfigModal" aria-label="Fechar modal">✕</button>
+      </div>
+
+      <form id="instanceConfigForm" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="switch-row">
+          <div>
+            <strong style="font-size:0.86rem;display:block;">Ignorar Grupos (groupsIgnore)</strong>
+            <span class="form-hint">Ignora todas as mensagens vindas de grupos</span>
+          </div>
+          <input type="checkbox" id="cfgGroupsIgnore" />
+        </div>
+
+        <div class="switch-row">
+          <div>
+            <strong style="font-size:0.86rem;display:block;">Sempre Online (alwaysOnline)</strong>
+            <span class="form-hint">Mantém o status do WhatsApp sempre online</span>
+          </div>
+          <input type="checkbox" id="cfgAlwaysOnline" />
+        </div>
+
+        <div class="switch-row">
+          <div>
+            <strong style="font-size:0.86rem;display:block;">Rejeitar Chamadas (rejectCall)</strong>
+            <span class="form-hint">Recusa ligações de voz/vídeo automaticamente</span>
+          </div>
+          <input type="checkbox" id="cfgRejectCall" />
+        </div>
+
+        <div class="switch-row">
+          <div>
+            <strong style="font-size:0.86rem;display:block;">Marcar Mensagens como Lidas (readMessages)</strong>
+            <span class="form-hint">Confirma leitura automática nas conversas</span>
+          </div>
+          <input type="checkbox" id="cfgReadMessages" />
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border-subtle);margin:4px 0;" />
+
+        <div class="switch-row">
+          <div>
+            <strong style="font-size:0.86rem;display:block;">Webhook Ativo (n8n / Automação)</strong>
+            <span class="form-hint">Dispara eventos MESSAGES_UPSERT para o fluxo</span>
+          </div>
+          <input type="checkbox" id="cfgWebhookEnabled" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cfgWebhookUrl">URL do Webhook</label>
+          <input type="url" id="cfgWebhookUrl" class="form-input" placeholder="http://n8n:5678/webhook/evolution" />
+        </div>
+
+        <div class="switch-row">
+          <div>
+            <strong style="font-size:0.86rem;display:block;">Enviar Mídia em Base64 (webhookBase64)</strong>
+            <span class="form-hint">Necessário para transcrição de áudio e leitura de fotos</span>
+          </div>
+          <input type="checkbox" id="cfgWebhookBase64" />
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-danger" id="btnDeleteInstance">Excluir Instância</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveInstanceConfig">Salvar Ajustes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Container de Notificações -->
+  <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+  <!-- Gerador leve de QR Code em Canvas caso a API retorne apenas o campo `code` sem `base64` -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" defer></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ==========================================================================
+         1. CONFIGURAÇÃO POR VARIÁVEIS DE AMBIENTE + COMPATIBILIDADE 1:1 COM EVOLUTION MANAGER
+         Chaves idênticas às do Evolution Manager oficial:
+         apiUrl, token, version, clientName, instanceId, instanceName, instanceToken
+         ========================================================================== */
+      const STORAGE_KEYS = {
+        API_URL: 'apiUrl',
+        TOKEN: 'token',
+        INSTANCE_ID: 'instanceId',
+        INSTANCE_NAME: 'instanceName',
+        INSTANCE_TOKEN: 'instanceToken',
+        VERSION: 'version',
+        CLIENT_NAME: 'clientName'
+      };
+
+      const RUNTIME_ENV = window.__ENV__ || {};
+      const params = new URLSearchParams(window.location.search);
+
+      if (params.get('apiUrl')) {
+        localStorage.setItem(STORAGE_KEYS.API_URL, params.get('apiUrl').replace(/\/+$/, ''));
+      }
+      if (params.get('token') || params.get('apikey')) {
+        localStorage.setItem(STORAGE_KEYS.TOKEN, params.get('token') || params.get('apikey'));
+      }
+
+      function getApiUrl() {
+        const stored = localStorage.getItem(STORAGE_KEYS.API_URL);
+        const envUrl = RUNTIME_ENV.VITE_EVO_API_URL || RUNTIME_ENV.EVO_API_URL || '';
+        return (stored || envUrl || '').replace(/\/+$/, '');
+      }
+
+      function getApiKey() {
+        const stored = localStorage.getItem(STORAGE_KEYS.TOKEN);
+        const envKey = RUNTIME_ENV.VITE_EVO_API_KEY || RUNTIME_ENV.EVO_API_KEY || '';
+        return (stored || envKey || '').trim();
+      }
+
+      /* Estado em Memória */
+      let instancesList = [];
+      let activeQrInstance = null;
+      let qrPollTimer = null;
+      let activeConfigInstance = null;
+      const revealedTokens = new Set();
+
+      /* Elementos de UI */
+      const navbar = document.getElementById('navbar');
+      const serverPulseDot = document.getElementById('serverPulseDot');
+      const serverUrlDisplay = document.getElementById('serverUrlDisplay');
+      const serverStatusText = document.getElementById('serverStatusText');
+      const lastSyncText = document.getElementById('lastSyncText');
+      const evoVersionBadge = document.getElementById('evoVersionBadge');
+      const btnLogoutServer = document.getElementById('btnLogoutServer');
+      const chipsContainer = document.getElementById('chipsContainer');
+
+      const statTotal = document.getElementById('statTotal');
+      const statOpen = document.getElementById('statOpen');
+      const statConnecting = document.getElementById('statConnecting');
+      const statClosed = document.getElementById('statClosed');
+
+      /* Auto-hide da Navbar ao rolar para baixo */
+      let lastScrollY = window.scrollY;
+      window.addEventListener('scroll', () => {
+        const currentY = window.scrollY;
+        if (currentY > 90 && currentY > lastScrollY) {
+          navbar.classList.add('nav-hidden');
+        } else {
+          navbar.classList.remove('nav-hidden');
+        }
+        lastScrollY = currentY;
+      }, { passive: true });
+
+      /* Utilitário de Toast */
+      function showToast(message, isError = false) {
+        const wrap = document.getElementById('toastWrap');
+        const el = document.createElement('div');
+        el.className = 'toast' + (isError ? ' error' : '');
+        el.textContent = message;
+        wrap.appendChild(el);
+        setTimeout(() => {
+          el.style.opacity = '0';
+          el.style.transition = 'opacity 0.25s ease';
+          setTimeout(() => el.remove(), 250);
+        }, 3800);
+      }
+
+      /* Utilitário de Requisição HTTP para a Evolution API */
+      async function evoRequest(path, options = {}) {
+        const baseUrl = (options.baseUrl || getApiUrl()).replace(/\/+$/, '');
+        const apiKey = options.apiKey || getApiKey();
+        if (!baseUrl || !apiKey) {
+          throw new Error('Servidor ou Global API Key não configurados.');
+        }
+
+        const headers = Object.assign({
+          'apikey': apiKey
+        }, options.headers || {});
+
+        if (options.body && !headers['Content-Type']) {
+          headers['Content-Type'] = 'application/json';
+        }
+
+        const response = await fetch(baseUrl + path, {
+          method: options.method || 'GET',
+          headers,
+          body: options.body ? JSON.stringify(options.body) : undefined
+        });
+
+        let data = null;
+        const text = await response.text();
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch (_) {
+          data = { raw: text };
+        }
+
+        if (!response.ok) {
+          const msg = data?.response?.message || data?.message || data?.error || ('Erro HTTP ' + response.status);
+          throw new Error(Array.isArray(msg) ? msg.join(', ') : String(msg));
+        }
+        return data;
+      }
+
+      /* Formata JID do WhatsApp para exibição legível */
+      function formatJid(ownerJid, fallbackNumber) {
+        const raw = ownerJid ? String(ownerJid).replace(/@s\.whatsapp\.net$/i, '') : (fallbackNumber || '');
+        if (!raw) return 'Sem número vinculado';
+        const digits = raw.replace(/\D/g, '');
+        if (digits.length === 13 && digits.startsWith('55')) {
+          return `+${digits.slice(0, 2)} (${digits.slice(2, 4)}) ${digits.slice(4, 9)}-${digits.slice(9)}`;
+        }
+        if (digits.length === 12 && digits.startsWith('55')) {
+          return `+${digits.slice(0, 2)} (${digits.slice(2, 4)}) ${digits.slice(4, 8)}-${digits.slice(8)}`;
+        }
+        return '+' + digits;
+      }
+
+      /* Extrai motivo amigável de desconexão */
+      function parseDisconnectionReason(inst) {
+        if (!inst.disconnectionReasonCode && !inst.disconnectionObject) return null;
+        let detail = '';
+        if (inst.disconnectionObject) {
+          try {
+            const parsed = JSON.parse(inst.disconnectionObject);
+            detail = parsed?.output?.payload?.message || parsed?.error?.data?.tag || '';
+          } catch (_) {}
+        }
+        const code = inst.disconnectionReasonCode ? `Código ${inst.disconnectionReasonCode}` : '';
+        return [code, detail].filter(Boolean).join(' · ');
+      }
+
+      /* ==========================================================================
+         2. FLUXO FIEL DE LOGIN E LISTAGEM (/verify-creds + /instance/fetchInstances)
+         ========================================================================== */
+      async function verifyAndSaveServer(serverUrlInput, apiKeyInput) {
+        const cleanUrl = serverUrlInput.trim().replace(/\/+$/, '').replace(/\/manager$/i, '');
+        const cleanKey = apiKeyInput.trim();
+
+        const rootRes = await fetch(cleanUrl + '/');
+        const rootData = await rootRes.json();
+        if (!rootData || !rootData.version) {
+          throw new Error('URL inválida: o servidor não respondeu como Evolution API.');
+        }
+
+        const verifyRes = await fetch(cleanUrl + '/verify-creds', {
+          method: 'POST',
+          headers: { 'apikey': cleanKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+
+        if (!verifyRes.ok) {
+          throw new Error('Global API Key inválida ou recusada pelo servidor.');
+        }
+
+        localStorage.setItem(STORAGE_KEYS.API_URL, cleanUrl);
+        localStorage.setItem(STORAGE_KEYS.TOKEN, cleanKey);
+        localStorage.setItem(STORAGE_KEYS.VERSION, rootData.version);
+        if (rootData.clientName) {
+          localStorage.setItem(STORAGE_KEYS.CLIENT_NAME, rootData.clientName);
+        }
+
+        return rootData;
+      }
+
+      async function fetchAllInstances(silent = false) {
+        const url = getApiUrl();
+        const key = getApiKey();
+
+        if (!url || !key) {
+          renderUnconfiguredState();
+          return;
+        }
+
+        serverUrlDisplay.textContent = url;
+        btnLogoutServer.style.display = 'inline-flex';
+        const savedVersion = localStorage.getItem(STORAGE_KEYS.VERSION);
+        if (savedVersion) {
+          evoVersionBadge.textContent = 'Evolution v' + savedVersion;
+        }
+
+        try {
+          const data = await evoRequest('/instance/fetchInstances');
+          const list = Array.isArray(data) ? data : (Array.isArray(data?.value) ? data.value : []);
+
+          /* Ordena whats-1, whats-2, whats-3 naturalmente por nome */
+          list.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { numeric: true }));
+
+          /* Consulta /instance/connectionState/<name> em paralelo para garantir o estado real do socket */
+          const enriched = await Promise.all(list.map(async (inst) => {
+            try {
+              const stateData = await evoRequest(`/instance/connectionState/${encodeURIComponent(inst.name)}`);
+              const liveState = stateData?.instance?.state;
+              if (liveState) {
+                inst.liveState = liveState;
+              }
+            } catch (_) {}
+            return inst;
+          }));
+
+          instancesList = enriched;
+
+          serverPulseDot.classList.remove('offline');
+          serverStatusText.textContent = 'Conectado à Evolution API';
+          lastSyncText.textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR');
+
+          updateSummaryCounters(instancesList);
+          renderInstancesGrid(instancesList);
+          if (!silent) {
+            showToast('Status dos chips sincronizado com sucesso.');
+          }
+        } catch (err) {
+          serverPulseDot.classList.add('offline');
+          serverStatusText.textContent = 'Erro de conexão: ' + err.message;
+          showToast(err.message, true);
+          renderErrorState(err.message);
+        }
+      }
+
+      function updateSummaryCounters(list) {
+        let openCount = 0;
+        let connectingCount = 0;
+        let closeCount = 0;
+
+        list.forEach((inst) => {
+          const st = inst.liveState || inst.connectionStatus || 'close';
+          if (st === 'open') openCount++;
+          else if (st === 'connecting') connectingCount++;
+          else closeCount++;
+        });
+
+        statTotal.textContent = String(list.length);
+        statOpen.textContent = String(openCount);
+        statConnecting.textContent = String(connectingCount);
+        statClosed.textContent = String(closeCount);
+      }
+
+      function renderUnconfiguredState() {
+        serverPulseDot.classList.add('offline');
+        serverUrlDisplay.textContent = 'Servidor Evolution API não conectado';
+        serverStatusText.textContent = 'Configure a URL da sua Evolution API e Global API Key';
+        btnLogoutServer.style.display = 'none';
+        updateSummaryCounters([]);
+
+        chipsContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="brand-logo" style="width:56px;height:56px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2">
+                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                <line x1="6" y1="18" x2="6.01" y2="18"></line>
+              </svg>
+            </div>
+            <h2 style="font-family:var(--font-display);font-size:1.25rem;font-weight:800;">Conecte seu Servidor Evolution API</h2>
+            <p style="color:var(--text-secondary);font-size:0.88rem;max-width:440px;">
+              Para gerenciar seus chips e gerar QR Codes de pareamento, informe a <strong>Server URL</strong> e a <strong>Global API Key</strong> da sua instância Evolution API. Nenhum dado fica exposto no código-fonte.
+            </p>
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('btnOpenServerModal').click()">
+              Conectar Evolution API
+            </button>
+          </div>
+        `;
+      }
+
+      function renderErrorState(errorMsg) {
+        chipsContainer.innerHTML = `
+          <div class="empty-state">
+            <h2 style="font-family:var(--font-display);font-size:1.15rem;font-weight:800;color:#FDA4AF;">Não foi possível carregar as instâncias</h2>
+            <p style="color:var(--text-secondary);font-size:0.86rem;">${escapeHtml(errorMsg)}</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('btnOpenServerModal').click()">Revisar Credenciais</button>
+              <button type="button" class="btn btn-primary" onclick="document.getElementById('btnRefreshAll').click()">Tentar Novamente</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function renderInstancesGrid(list) {
+        if (!list.length) {
+          chipsContainer.innerHTML = `
+            <div class="empty-state">
+              <h2 style="font-family:var(--font-display);font-size:1.15rem;font-weight:800;">Nenhum chip cadastrado ainda</h2>
+              <p style="color:var(--text-secondary);font-size:0.86rem;">Crie sua primeira instância (ex.: whats-1) para gerar o QR Code de pareamento.</p>
+              <button type="button" class="btn btn-primary" onclick="document.getElementById('btnOpenCreateModal').click()">+ Criar Primeiro Chip</button>
+            </div>
+          `;
+          return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'chips-grid';
+
+        list.forEach((inst) => {
+          const effectiveStatus = inst.liveState || inst.connectionStatus || 'close';
+          const isConnected = effectiveStatus === 'open';
+          const isConnecting = effectiveStatus === 'connecting';
+
+          const statusLabel = isConnected
+            ? 'Conectado'
+            : (isConnecting ? 'Aguardando QR' : 'Desconectado');
+
+          const statusClass = isConnected ? 'open' : (isConnecting ? 'connecting' : 'close');
+          const profileName = inst.profileName || 'Aparelho não autenticado';
+          const formattedPhone = formatJid(inst.ownerJid, inst.number);
+          const initials = (inst.name || 'W').slice(0, 2).toUpperCase();
+          const disconnectReason = !isConnected ? parseDisconnectionReason(inst) : null;
+
+          const contactsCount = inst._count?.Contact ?? 0;
+          const chatsCount = inst._count?.Chat ?? 0;
+          const messagesCount = inst._count?.Message ?? 0;
+
+          const isTokenShown = revealedTokens.has(inst.id);
+          const displayToken = isTokenShown
+            ? (inst.token || 'Sem token')
+            : '••••••••••••••••••••••••••••••••';
+
+          const card = document.createElement('article');
+          card.className = `chip-card status-${statusClass}`;
+          card.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <!-- Topo: Nome da Instância e Status -->
+              <div class="chip-top">
+                <div class="chip-name-wrap">
+                  <div class="chip-name">
+                    <span>${escapeHtml(inst.name)}</span>
+                  </div>
+                  <span class="chip-integration">${escapeHtml(inst.integration || 'WHATSAPP-BAILEYS')}</span>
+                </div>
+                <span class="status-pill ${statusClass}">
+                  <span class="status-dot"></span>
+                  <span>${statusLabel}</span>
+                </span>
+              </div>
+
+              <!-- Perfil Vinculado -->
+              <div class="chip-profile">
+                <div class="chip-avatar">
+                  ${inst.profilePicUrl
+                    ? `<img src="${escapeHtml(inst.profilePicUrl)}" alt="${escapeHtml(profileName)}" loading="lazy" decoding="async" width="46" height="46" onerror="this.remove()" />`
+                    : `<span>${escapeHtml(initials)}</span>`
+                  }
+                </div>
+                <div class="chip-profile-info">
+                  <span class="chip-profile-name">${escapeHtml(profileName)}</span>
+                  <span class="chip-jid" title="${escapeHtml(inst.ownerJid || '')}">${escapeHtml(formattedPhone)}</span>
+                </div>
+              </div>
+
+              <!-- Token da Instância com Mostrar/Ocultar e Copiar -->
+              <div class="token-box">
+                <span class="token-value">${escapeHtml(displayToken)}</span>
+                <div style="display:flex;gap:2px;">
+                  <button type="button" class="token-btn" data-action="toggle-token" data-id="${escapeHtml(inst.id)}" title="Mostrar ou ocultar token">
+                    ${isTokenShown ? '🙈' : '👁'}
+                  </button>
+                  <button type="button" class="token-btn" data-action="copy-token" data-token="${escapeHtml(inst.token || '')}" title="Copiar token da instância">
+                    📋
+                  </button>
+                </div>
+              </div>
+
+              <!-- Alerta se Desconectado ou Aguardando Pareamento -->
+              ${!isConnected ? `
+                <div class="chip-alert">
+                  <span class="chip-alert-text">Para conectar este chip, gere o QR Code e escaneie no WhatsApp do aparelho.</span>
+                  ${disconnectReason ? `<span class="chip-alert-reason">Última desconexão: ${escapeHtml(disconnectReason)}</span>` : ''}
+                </div>
+              ` : ''}
+
+              <!-- Contadores Reais da Evolution API -->
+              <div class="chip-stats">
+                <div class="chip-stat-box">
+                  <div class="chip-stat-num">${Number(contactsCount).toLocaleString('pt-BR')}</div>
+                  <div class="chip-stat-lbl">Contatos</div>
+                </div>
+                <div class="chip-stat-box">
+                  <div class="chip-stat-num">${Number(chatsCount).toLocaleString('pt-BR')}</div>
+                  <div class="chip-stat-lbl">Conversas</div>
+                </div>
+                <div class="chip-stat-box">
+                  <div class="chip-stat-num">${Number(messagesCount).toLocaleString('pt-BR')}</div>
+                  <div class="chip-stat-lbl">Mensagens</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botões de Ação Fiel ao Evolution Manager -->
+            <div class="chip-actions">
+              ${!isConnected ? `
+                <button type="button" class="btn btn-warning" data-action="connect-qr" data-name="${escapeHtml(inst.name)}" style="width:100%;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                  </svg>
+                  <span>Conectar / Ler QR Code</span>
+                </button>
+              ` : `
+                <button type="button" class="btn btn-secondary" data-action="connect-qr" data-name="${escapeHtml(inst.name)}" style="width:100%;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                  </svg>
+                  <span>Status / Reconectar QR</span>
+                </button>
+              `}
+
+              <div class="chip-actions-row">
+                <button type="button" class="btn btn-secondary" data-action="restart" data-name="${escapeHtml(inst.name)}" title="POST /instance/restart/${escapeHtml(inst.name)}">
+                  <span>Reiniciar</span>
+                </button>
+                <button type="button" class="btn btn-danger" data-action="logout" data-name="${escapeHtml(inst.name)}" ${effectiveStatus === 'close' && !inst.connectionStatus ? 'disabled' : ''} title="DELETE /instance/logout/${escapeHtml(inst.name)}">
+                  <span>Desconectar</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-icon" data-action="settings" data-name="${escapeHtml(inst.name)}" title="Configurações e Webhook">
+                  ⚙
+                </button>
+              </div>
+            </div>
+          `;
+
+          grid.appendChild(card);
+        });
+
+        chipsContainer.innerHTML = '';
+        chipsContainer.appendChild(grid);
+      }
+
+      /* ==========================================================================
+         3. FLUXO FIEL DE QR CODE & PAIRING CODE (/instance/connect/<instanceName>)
+         ========================================================================== */
+      const qrModal = document.getElementById('qrModal');
+      const qrStage = document.getElementById('qrStage');
+      const qrModalTitle = document.getElementById('qrModalTitle');
+      const qrModalSubtitle = document.getElementById('qrModalSubtitle');
+      const pairingCodeSection = document.getElementById('pairingCodeSection');
+      const pairingCodeDisplay = document.getElementById('pairingCodeDisplay');
+      const pairingPhoneInput = document.getElementById('pairingPhoneInput');
+      const qrPollingStatus = document.getElementById('qrPollingStatus');
+
+      function stopQrPolling() {
+        if (qrPollTimer) {
+          clearInterval(qrPollTimer);
+          qrPollTimer = null;
+        }
+      }
+
+      function closeQrModal() {
+        stopQrPolling();
+        qrModal.classList.remove('open');
+        activeQrInstance = null;
+        fetchAllInstances(true);
+      }
+
+      async function openQrModalForInstance(instanceName) {
+        const inst = instancesList.find((x) => x.name === instanceName);
+        if (!inst) return;
+
+        activeQrInstance = inst;
+        /* Grava as mesmas chaves no localStorage que o Evolution Manager grava ao abrir uma instância */
+        localStorage.setItem(STORAGE_KEYS.INSTANCE_ID, inst.id || '');
+        localStorage.setItem(STORAGE_KEYS.INSTANCE_NAME, inst.name || '');
+        localStorage.setItem(STORAGE_KEYS.INSTANCE_TOKEN, inst.token || '');
+
+        qrModalTitle.textContent = `Conectar ${inst.name}`;
+        qrModalSubtitle.textContent = 'WhatsApp → Dispositivos conectados → Conectar dispositivo';
+        pairingCodeSection.style.display = 'none';
+        pairingPhoneInput.value = inst.number || '';
+        qrModal.classList.add('open');
+
+        await requestQrCode(inst.name, false);
+
+        stopQrPolling();
+        qrPollTimer = setInterval(async () => {
+          if (!activeQrInstance) return;
+          try {
+            const st = await evoRequest(`/instance/connectionState/${encodeURIComponent(activeQrInstance.name)}`);
+            const state = st?.instance?.state;
+            qrPollingStatus.textContent = `Status do socket: ${state || 'verificando'} (${new Date().toLocaleTimeString('pt-BR')})`;
+            if (state === 'open') {
+              showToast(`Chip ${activeQrInstance.name} conectado com sucesso!`);
+              closeQrModal();
+            }
+          } catch (_) {}
+        }, 3000);
+      }
+
+      async function requestQrCode(instanceName, usePairingNumber = false) {
+        qrStage.innerHTML = `
+          <div class="spinner"></div>
+          <p style="color:#334155;font-size:0.84rem;font-weight:600;margin-top:12px;">Gerando QR Code na Evolution API...</p>
+        `;
+
+        try {
+          let endpoint = `/instance/connect/${encodeURIComponent(instanceName)}`;
+          const phoneDigits = pairingPhoneInput.value.replace(/\D/g, '');
+          if (usePairingNumber && phoneDigits) {
+            endpoint += `?number=${encodeURIComponent(phoneDigits)}`;
+          }
+
+          const data = await evoRequest(endpoint);
+
+          if (data?.instance?.state === 'open') {
+            qrStage.innerHTML = `
+              <div style="text-align:center;color:#059669;padding:20px;">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" style="margin:0 auto 10px;">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <h3 style="font-size:1.1rem;font-weight:800;color:#064E3B;">Chip Já Conectado!</h3>
+                <p style="font-size:0.84rem;color:#334155;margin-top:4px;">Esta instância está com sessão ativa (open).</p>
+              </div>
+            `;
+            return;
+          }
+
+          if (data?.pairingCode) {
+            const pc = String(data.pairingCode);
+            pairingCodeDisplay.textContent = pc.length === 8 ? `${pc.slice(0, 4)}-${pc.slice(4, 8)}` : pc;
+            pairingCodeSection.style.display = 'block';
+          }
+
+          if (data?.base64) {
+            qrStage.innerHTML = `<img src="${escapeHtml(data.base64)}" alt="QR Code WhatsApp ${escapeHtml(instanceName)}" width="248" height="248" />`;
+          } else if (data?.code && window.QRCode) {
+            qrStage.innerHTML = '<canvas id="qrCanvas"></canvas>';
+            const canvas = document.getElementById('qrCanvas');
+            await window.QRCode.toCanvas(canvas, data.code, { width: 248, margin: 1 });
+          } else {
+            qrStage.innerHTML = `
+              <p style="color:#475569;font-size:0.85rem;text-align:center;padding:16px;">
+                A instância está inicializando o QR Code. Clique em <strong>Novo QR Code</strong> ou em <strong>Reiniciar</strong> se o chip estava travado.
+              </p>
+            `;
+          }
+        } catch (err) {
+          qrStage.innerHTML = `
+            <p style="color:#E11D48;font-size:0.85rem;text-align:center;padding:16px;font-weight:600;">
+              Erro ao buscar QR Code: ${escapeHtml(err.message)}
+            </p>
+          `;
+        }
+      }
+
+      /* ==========================================================================
+         4. AÇÕES DE INSTÂNCIA: RESTART, LOGOUT, CREATE, DELETE, SETTINGS & WEBHOOK
+         ========================================================================== */
+      async function restartInstance(instanceName) {
+        try {
+          showToast(`Reiniciando ${instanceName}...`);
+          await evoRequest(`/instance/restart/${encodeURIComponent(instanceName)}`, { method: 'POST' });
+          showToast(`Instância ${instanceName} reiniciada.`);
+          await fetchAllInstances(true);
+        } catch (err) {
+          showToast(`Erro ao reiniciar: ${err.message}`, true);
+        }
+      }
+
+      async function logoutInstance(instanceName) {
+        if (!window.confirm(`Deseja realmente desconectar a sessão do chip "${instanceName}"? Será necessário ler o QR Code novamente para reconectar.`)) {
+          return;
+        }
+        try {
+          showToast(`Desconectando ${instanceName}...`);
+          await evoRequest(`/instance/logout/${encodeURIComponent(instanceName)}`, { method: 'DELETE' });
+          showToast(`Sessão de ${instanceName} desconectada.`);
+          await fetchAllInstances(true);
+        } catch (err) {
+          showToast(`Erro ao desconectar: ${err.message}`, true);
+        }
+      }
+
+      /* Modal de Configurações & Webhook */
+      const configModal = document.getElementById('configModal');
+      async function openConfigModal(instanceName) {
+        const inst = instancesList.find((x) => x.name === instanceName);
+        if (!inst) return;
+        activeConfigInstance = inst;
+
+        document.getElementById('configModalTitle').textContent = `Ajustes: ${inst.name}`;
+        document.getElementById('configModalSubtitle').textContent = `ID: ${inst.id}`;
+
+        /* Valores padrão do objeto Setting retornado por fetchInstances */
+        const st = inst.Setting || {};
+        document.getElementById('cfgGroupsIgnore').checked = !!st.groupsIgnore;
+        document.getElementById('cfgAlwaysOnline').checked = !!st.alwaysOnline;
+        document.getElementById('cfgRejectCall').checked = !!st.rejectCall;
+        document.getElementById('cfgReadMessages').checked = !!st.readMessages;
+
+        document.getElementById('cfgWebhookEnabled').checked = false;
+        document.getElementById('cfgWebhookUrl').value = RUNTIME_ENV.VITE_DEFAULT_WEBHOOK_URL || '';
+        document.getElementById('cfgWebhookBase64').checked = true;
+
+        configModal.classList.add('open');
+
+        /* Busca settings e webhook atuais em paralelo */
+        try {
+          const [liveSettings, liveWebhook] = await Promise.all([
+            evoRequest(`/settings/find/${encodeURIComponent(inst.name)}`).catch(() => null),
+            evoRequest(`/webhook/find/${encodeURIComponent(inst.name)}`).catch(() => null)
+          ]);
+
+          if (liveSettings) {
+            document.getElementById('cfgGroupsIgnore').checked = !!liveSettings.groupsIgnore;
+            document.getElementById('cfgAlwaysOnline').checked = !!liveSettings.alwaysOnline;
+            document.getElementById('cfgRejectCall').checked = !!liveSettings.rejectCall;
+            document.getElementById('cfgReadMessages').checked = !!liveSettings.readMessages;
+          }
+
+          if (liveWebhook) {
+            document.getElementById('cfgWebhookEnabled').checked = !!liveWebhook.enabled;
+            document.getElementById('cfgWebhookUrl').value = liveWebhook.url || '';
+            document.getElementById('cfgWebhookBase64').checked = !!liveWebhook.webhookBase64;
+          }
+        } catch (_) {}
+      }
+
+      /* ==========================================================================
+         5. EVENT LISTENERS E INICIALIZAÇÃO
+         ========================================================================== */
+      chipsContainer.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+
+        const action = btn.getAttribute('data-action');
+        const name = btn.getAttribute('data-name');
+
+        if (action === 'connect-qr' && name) {
+          openQrModalForInstance(name);
+        } else if (action === 'restart' && name) {
+          restartInstance(name);
+        } else if (action === 'logout' && name) {
+          logoutInstance(name);
+        } else if (action === 'settings' && name) {
+          openConfigModal(name);
+        } else if (action === 'toggle-token') {
+          const id = btn.getAttribute('data-id');
+          if (revealedTokens.has(id)) revealedTokens.delete(id);
+          else revealedTokens.add(id);
+          renderInstancesGrid(instancesList);
+        } else if (action === 'copy-token') {
+          const token = btn.getAttribute('data-token');
+          if (token && navigator.clipboard) {
+            await navigator.clipboard.writeText(token);
+            showToast('Token da instância copiado para a área de transferência.');
+          }
+        }
+      });
+
+      /* Controles do Modal QR */
+      document.getElementById('btnCloseQrModal').addEventListener('click', closeQrModal);
+      document.getElementById('btnRefreshQr').addEventListener('click', () => {
+        if (activeQrInstance) requestQrCode(activeQrInstance.name, false);
+      });
+      document.getElementById('btnGetPairingCode').addEventListener('click', () => {
+        if (activeQrInstance) requestQrCode(activeQrInstance.name, true);
+      });
+
+      /* Controles do Modal Servidor */
+      const serverModal = document.getElementById('serverModal');
+      function openServerModal() {
+        document.getElementById('inputServerUrl').value = getApiUrl();
+        document.getElementById('inputApiKey').value = getApiKey();
+        serverModal.classList.add('open');
+      }
+      document.getElementById('btnOpenServerModal').addEventListener('click', openServerModal);
+      document.getElementById('navConfigLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        openServerModal();
+      });
+      document.getElementById('btnCloseServerModal').addEventListener('click', () => serverModal.classList.remove('open'));
+      document.getElementById('btnCancelServerModal').addEventListener('click', () => serverModal.classList.remove('open'));
+
+      document.getElementById('serverForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnSaveServer');
+        btn.disabled = true;
+        btn.textContent = 'Validando...';
+        try {
+          const urlVal = document.getElementById('inputServerUrl').value;
+          const keyVal = document.getElementById('inputApiKey').value;
+          await verifyAndSaveServer(urlVal, keyVal);
+          serverModal.classList.remove('open');
+          showToast('Servidor Evolution API autenticado com sucesso!');
+          await fetchAllInstances(true);
+        } catch (err) {
+          showToast(err.message, true);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Validar & Conectar';
+        }
+      });
+
+      btnLogoutServer.addEventListener('click', () => {
+        if (!window.confirm('Remover a URL e a Global API Key salvas neste navegador?')) return;
+        Object.values(STORAGE_KEYS).forEach((k) => localStorage.removeItem(k));
+        instancesList = [];
+        renderUnconfiguredState();
+        showToast('Credenciais removidas deste navegador.');
+      });
+
+      /* Controles do Modal Criar Chip */
+      const createModal = document.getElementById('createModal');
+      function generateRandomToken() {
+        if (window.crypto && window.crypto.randomUUID) {
+          return window.crypto.randomUUID().toUpperCase();
+        }
+        return 'TOKEN-' + Math.random().toString(36).substring(2, 12).toUpperCase();
+      }
+
+      document.getElementById('btnOpenCreateModal').addEventListener('click', () => {
+        if (!getApiUrl() || !getApiKey()) {
+          openServerModal();
+          return;
+        }
+        document.getElementById('inputInstanceName').value = '';
+        document.getElementById('inputInstanceToken').value = generateRandomToken();
+        document.getElementById('inputInstanceNumber').value = '';
+        createModal.classList.add('open');
+      });
+      document.getElementById('btnCloseCreateModal').addEventListener('click', () => createModal.classList.remove('open'));
+      document.getElementById('btnCancelCreateModal').addEventListener('click', () => createModal.classList.remove('open'));
+
+      document.getElementById('createInstanceForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnCreateSubmit');
+        btn.disabled = true;
+        btn.textContent = 'Criando...';
+        try {
+          const payload = {
+            instanceName: document.getElementById('inputInstanceName').value.trim(),
+            integration: document.getElementById('inputIntegration').value,
+            token: document.getElementById('inputInstanceToken').value.trim() || null,
+            number: document.getElementById('inputInstanceNumber').value.trim() || null
+          };
+          await evoRequest('/instance/create', { method: 'POST', body: payload });
+          createModal.classList.remove('open');
+          showToast(`Chip ${payload.instanceName} criado com sucesso!`);
+          await fetchAllInstances(true);
+          openQrModalForInstance(payload.instanceName);
+        } catch (err) {
+          showToast(`Erro ao criar instância: ${err.message}`, true);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Criar Chip';
+        }
+      });
+
+      /* Controles do Modal Configurações & Webhook */
+      document.getElementById('btnCloseConfigModal').addEventListener('click', () => configModal.classList.remove('open'));
+
+      document.getElementById('instanceConfigForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!activeConfigInstance) return;
+        const btn = document.getElementById('btnSaveInstanceConfig');
+        btn.disabled = true;
+        btn.textContent = 'Salvando...';
+        try {
+          const currentSetting = activeConfigInstance.Setting || {};
+          const settingsPayload = {
+            rejectCall: document.getElementById('cfgRejectCall').checked,
+            msgCall: currentSetting.msgCall || '',
+            groupsIgnore: document.getElementById('cfgGroupsIgnore').checked,
+            alwaysOnline: document.getElementById('cfgAlwaysOnline').checked,
+            readMessages: document.getElementById('cfgReadMessages').checked,
+            readStatus: !!currentSetting.readStatus,
+            syncFullHistory: !!currentSetting.syncFullHistory
+          };
+
+          await evoRequest(`/settings/set/${encodeURIComponent(activeConfigInstance.name)}`, {
+            method: 'POST',
+            body: settingsPayload
+          });
+
+          const whUrl = document.getElementById('cfgWebhookUrl').value.trim();
+          const whEnabled = document.getElementById('cfgWebhookEnabled').checked;
+          if (whUrl) {
+            await evoRequest(`/webhook/set/${encodeURIComponent(activeConfigInstance.name)}`, {
+              method: 'POST',
+              body: {
+                webhook: {
+                  enabled: whEnabled,
+                  url: whUrl,
+                  events: ['MESSAGES_UPSERT'],
+                  base64: document.getElementById('cfgWebhookBase64').checked,
+                  byEvents: false
+                }
+              }
+            });
+          }
+
+          configModal.classList.remove('open');
+          showToast(`Configurações de ${activeConfigInstance.name} salvas!`);
+          await fetchAllInstances(true);
+        } catch (err) {
+          showToast(`Erro ao salvar configurações: ${err.message}`, true);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Salvar Ajustes';
+        }
+      });
+
+      document.getElementById('btnDeleteInstance').addEventListener('click', async () => {
+        if (!activeConfigInstance) return;
+        const name = activeConfigInstance.name;
+        if (!window.confirm(`ATENÇÃO: Deseja excluir permanentemente a instância "${name}" da Evolution API?`)) {
+          return;
+        }
+        try {
+          await evoRequest(`/instance/delete/${encodeURIComponent(name)}`, { method: 'DELETE' });
+          configModal.classList.remove('open');
+          showToast(`Instância ${name} excluída.`);
+          await fetchAllInstances(true);
+        } catch (err) {
+          showToast(`Erro ao excluir: ${err.message}`, true);
+        }
+      });
+
+      document.getElementById('btnRefreshAll').addEventListener('click', () => fetchAllInstances(false));
+
+      /* Inicialização Automática */
+      fetchAllInstances(true);
+    })();
+  </script>
+</body>
+</html>
